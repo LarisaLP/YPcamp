@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clasament Tabără</title>
+<style>
+
+/* ============================================================
+   EDITEAZĂ AICI SCORUL, în fiecare zi, după ce faci calculele.
+   Nu atinge restul fișierului dacă nu ești sigur ce faci.
+   ============================================================ */
+
+</style>
+</head>
+<body>
+
+<div class="sky">
+  <div class="stars"></div>
+</div>
+
+<main>
+  <header class="hero">
+    <p class="eyebrow">TABĂRA · CLASAMENT GENERAL</p>
+    <h1>Cine e sus <span class="accent">azi</span>?</h1>
+    <p class="day-label" id="dayLabel">Actualizat după Ziua <span id="dayNum">1</span></p>
+  </header>
+
+  <section class="board" id="board"></section>
+
+  <footer class="foot">
+    <p>Scorul se actualizează la finalul fiecărei zile de organizatori.</p>
+  </footer>
+</main>
+
+<script>
+/* ============================================================
+   1) EDITEAZĂ AICI — pui scorul curent al fiecărei echipe
+      și numărul zilei. Restul paginii se calculează singur.
+   ============================================================ */
+const DAY = 1;
+
+const teams = [
+  { name: "Albastru",   score: 0, color: "#2E6FEC", dark: "#0F2C63" },
+  { name: "Galben",     score: 0, color: "#F2B705", dark: "#5C4300" },
+  { name: "Portocaliu", score: 0, color: "#F2650C", dark: "#5C2200" },
+  { name: "Verde",      score: 0, color: "#2FA84F", dark: "#0F3E1F" },
+];
+
+/* ============================================================
+   2) NU MAI EDITA DE AICI ÎN JOS
+   ============================================================ */
+
+document.getElementById("dayNum").textContent = DAY;
+
+const sorted = [...teams].sort((a, b) => b.score - a.score);
+const maxScore = Math.max(1, ...teams.map(t => t.score));
+
+const board = document.getElementById("board");
+
+sorted.forEach((team, i) => {
+  const rank = i + 1;
+  const pct = Math.max(6, Math.round((team.score / maxScore) * 100));
+
+  const row = document.createElement("div");
+  row.className = "row";
+  row.style.setProperty("--accent", team.color);
+  row.style.setProperty("--accent-dark", team.dark);
+  row.style.setProperty("--delay", `${i * 90}ms`);
+
+  row.innerHTML = `
+    <div class="rank">
+      <span class="rank-num">${rank}</span>
+      ${rank === 1 ? '<span class="crown">&#9819;</span>' : ""}
+    </div>
+    <div class="bar-wrap">
+      <div class="bar-label">
+        <span class="team-name">Echipa ${team.name}</span>
+        <span class="team-score">${team.score} <small>pct</small></span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%"></div>
+      </div>
+    </div>
+  `;
+  board.appendChild(row);
+});
+</script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;600;700;800&display=swap');
+
+:root {
+  --bg: #0B1220;
+  --bg-2: #0E1728;
+  --paper: #131E33;
+  --ink: #EDEFF5;
+  --ink-dim: #8B96AC;
+  --line: rgba(255,255,255,0.08);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Manrope', sans-serif;
+  min-height: 100vh;
+}
+
+.sky {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(46,111,236,0.18), transparent),
+    radial-gradient(ellipse 60% 40% at 90% 10%, rgba(242,101,12,0.10), transparent);
+  z-index: -1;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 56px 20px 80px;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 44px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--ink-dim);
+  font-weight: 700;
+  margin: 0 0 14px;
+}
+
+h1 {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(34px, 7vw, 52px);
+  line-height: 1.05;
+  margin: 0 0 14px;
+  letter-spacing: -0.01em;
+}
+
+.accent {
+  color: #F2B705;
+}
+
+.day-label {
+  color: var(--ink-dim);
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 20px;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: rise 0.5s ease forwards;
+  animation-delay: var(--delay);
+}
+
+@keyframes rise {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.rank {
+  flex: 0 0 auto;
+  width: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.rank-num {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 22px;
+  color: var(--ink-dim);
+}
+
+.row:first-child .rank-num {
+  color: #F2B705;
+}
+
+.crown {
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.bar-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.bar-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.team-name {
+  font-weight: 800;
+  font-size: 17px;
+}
+
+.team-score {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 20px;
+  color: var(--accent);
+}
+
+.team-score small {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-left: 2px;
+}
+
+.bar-track {
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent-dark), var(--accent));
+  transition: width 0.8s ease;
+}
+
+.foot {
+  text-align: center;
+  margin-top: 48px;
+}
+
+.foot p {
+  color: var(--ink-dim);
+  font-size: 13px;
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  main { padding: 40px 16px 60px; }
+  .row { padding: 14px 14px; gap: 12px; }
+  .rank { width: 30px; }
+  .rank-num { font-size: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row { animation: none; opacity: 1; transform: none; }
+  .bar-fill { transition: none; }
+}
+</style>
+
+</body>
+</html>
